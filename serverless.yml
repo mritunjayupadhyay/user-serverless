@@ -1,0 +1,54 @@
+service: user-serverless
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-south-1
+  memorySize: 256
+  timeout: 30
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - ssm:GetParameter
+          Resource:
+            - arn:aws:ssm:${self:provider.region}:${aws:accountId}:parameter/my-first-parameter-store
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 8003
+    lambdaPort: 8004
+    host: 0.0.0.0
+
+package:
+  individually: true
+  patterns:
+    # Include necessary files
+    - "dist/**"  # Include compiled files
+    - "node_modules/**"
+    - ".env.${opt:stage, 'dev'}"
+    # Exclude unnecessary files
+    - "!src/**"
+    - "!test/**"
+    - "!node_modules/@types/**"
+    - "!node_modules/.prisma/**"
+    - "!node_modules/@prisma/engines/**"
+    - "!node_modules/prisma/**"
+    - "!.git/**"
+    - "!.vscode/**"
+
+functions:
+  main:
+    environment:
+      NODE_ENV: ${opt:stage, 'local'}
+      MY_PARAMETER: ${ssm:/my-first-parameter-store, 'local-fallback-value'}
+    handler: dist/src/lambda.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true

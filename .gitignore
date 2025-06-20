@@ -2,6 +2,10 @@
 /dist
 /node_modules
 /build
+/.serverless/
+.serverless
+/.serverless
+.serverless/
 
 # Logs
 logs
@@ -38,8 +42,10 @@ lerna-debug.log*
 # dotenv environment variable files
 .env
 .env.development.local
+.env.development
 .env.test.local
 .env.production.local
+.env.production
 .env.local
 
 # temp directory
@@ -54,3 +60,6 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# postgredb volume
+/db-data
