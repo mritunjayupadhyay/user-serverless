@@ -1,6 +1,6 @@
 import { pgTable, pgEnum, uuid, boolean, timestamp } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
-import { users } from './user';
+import { members } from './user';
 import { organizations } from './organization';
 
 export const roleEnum = pgEnum('role', [
@@ -15,7 +15,7 @@ export const userRoles = pgTable('user_roles', {
   role: roleEnum('role').default('student').notNull(),
   isActive: boolean('is_active').default(true).notNull(),
   userId: uuid('user_id')
-    .references(() => users.id)
+    .references(() => members.id)
     .notNull(),
   organizationId: uuid('organization_id')
     .references(() => organizations.id)
@@ -25,9 +25,9 @@ export const userRoles = pgTable('user_roles', {
 });
 
 export const userRolesRelations = relations(userRoles, ({ one }) => ({
-  user: one(users, {
+  user: one(members, {
     fields: [userRoles.userId],
-    references: [users.id],
+    references: [members.id],
   }),
   organization: one(organizations, {
     fields: [userRoles.organizationId],

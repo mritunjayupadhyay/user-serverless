@@ -8,8 +8,9 @@ import {
 import { relations } from 'drizzle-orm';
 import { userRoles } from './user-role';
 
-export const users = pgTable('users', {
+export const members = pgTable('members', {
   id: uuid('id').primaryKey().defaultRandom(),
+  clerkId: varchar('clerk_id', { length: 255 }).unique(),
   email: varchar('email', { length: 255 }).unique().notNull(),
   firstName: varchar('first_name', { length: 255 }).notNull(),
   lastName: varchar('last_name', { length: 255 }).notNull(),
@@ -19,6 +20,6 @@ export const users = pgTable('users', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const membersRelations = relations(members, ({ many }) => ({
   userRoles: many(userRoles),
 }));

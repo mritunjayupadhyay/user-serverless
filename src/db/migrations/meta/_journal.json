@@ -8,6 +8,27 @@
       "when": 1750406747870,
       "tag": "0000_thick_alex_power",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1750416577139,
+      "tag": "0001_fresh_zarda",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1750416807811,
+      "tag": "0002_silent_juggernaut",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1750471425317,
+      "tag": "0003_nosy_scrambler",
+      "breakpoints": true
     }
   ]
 }

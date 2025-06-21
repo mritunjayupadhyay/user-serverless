@@ -9,6 +9,7 @@ import * as express from 'express';
 import { configure as serverlessExpress } from '@vendia/serverless-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 
 let cachedServer: any;
 
@@ -19,6 +20,7 @@ const bootstrap = async () => {
       AppModule,
       new ExpressAdapter(expressApp),
     );
+    app.useGlobalPipes(new ValidationPipe());
     const basePath = `/${process.env.NODE_ENV || 'dev'}/`;
     const config = new DocumentBuilder()
       .setTitle('Question Bank API')
