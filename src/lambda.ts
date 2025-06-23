@@ -21,6 +21,7 @@ const bootstrap = async () => {
       new ExpressAdapter(expressApp),
     );
     app.useGlobalPipes(new ValidationPipe());
+    app.enableCors();
     const basePath = `/${process.env.NODE_ENV || 'dev'}/`;
     const config = new DocumentBuilder()
       .setTitle('Question Bank API')
@@ -35,7 +36,7 @@ const bootstrap = async () => {
         basePath: basePath,
       },
     });
-    app.enableCors();
+
     await app.init();
     cachedServer = serverlessExpress({ app: expressApp });
   }
@@ -43,6 +44,7 @@ const bootstrap = async () => {
 };
 
 export const handler: APIGatewayProxyHandler = async (event, context) => {
+  context.callbackWaitsForEmptyEventLoop = false;
   const server = await bootstrap();
   return server(event, context);
 };

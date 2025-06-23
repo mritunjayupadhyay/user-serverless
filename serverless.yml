@@ -32,6 +32,20 @@ package:
     - "node_modules/**"
     - ".env.${opt:stage, 'dev'}"
     # Exclude unnecessary files
+    - "!node_modules/**/*.md"
+    - "!node_modules/**/*.txt"
+    - "!node_modules/**/LICENSE*"
+    - "!node_modules/**/CHANGELOG*"
+    - "!node_modules/**/*.map"
+    - "!node_modules/**/*.d.ts"
+    - "!node_modules/**/test/**"
+    - "!node_modules/**/tests/**"
+    - "!node_modules/**/docs/**"
+    - "!node_modules/**/examples/**"
+    - "!node_modules/**/.github/**"
+    - "!node_modules/**/coverage/**"
+    - "!node_modules/**/*.spec.js"
+    - "!node_modules/**/*.test.js"
     - "!src/**"
     - "!test/**"
     - "!node_modules/@types/**"
@@ -40,6 +54,8 @@ package:
     - "!node_modules/prisma/**"
     - "!.git/**"
     - "!.vscode/**"
+    - "!*.log"
+    - "!coverage/**"
 
 functions:
   main:
