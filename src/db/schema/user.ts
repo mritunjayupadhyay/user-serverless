@@ -3,10 +3,13 @@ import {
   uuid,
   varchar,
   boolean,
+  pgEnum,
   timestamp,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { userRoles } from './user-role';
+
+export const genderEnum = pgEnum('gender', ['male', 'female', 'other']);
 
 export const members = pgTable('members', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -15,6 +18,9 @@ export const members = pgTable('members', {
   firstName: varchar('first_name', { length: 255 }).notNull(),
   lastName: varchar('last_name', { length: 255 }).notNull(),
   phone: varchar('phone', { length: 50 }),
+  gender: genderEnum('gender').default('male').notNull(),
+  profilePic: varchar('profile_pic'),
+  birthday: varchar('birthday', { length: 50 }),
   isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),

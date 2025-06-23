@@ -1,74 +1,87 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import postgres = require('postgres');
 import * as dotenv from 'dotenv';
-import { Pool } from 'pg';
 import * as schema from './schema';
 
 // Connection pooling is different in serverless environments
-let db: ReturnType<typeof createDrizzleClient>;
-let poolConnection: Pool; // Store the pool connection
+let db: PostgresJsDatabase<typeof schema>;
+let sql: ReturnType<typeof postgres>;
 
 // Create a new Drizzle client (avoiding multiple connections in serverless environment)
-function createDrizzleClient() {
+function createDrizzleClient(): PostgresJsDatabase<typeof schema> {
   dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+
   const isProduction = process.env.NODE_ENV === 'production';
-
-  let connectionString: string;
-  let poolConfig: any;
-
   console.log('isProduction', isProduction);
 
-  if (isProduction) {
-    // Use the Neon URL directly
-    connectionString = process.env.NEON_DATABASE_URL || '';
-    if (!connectionString) {
-      throw new Error('NEON_DATABASE_URL is required in production mode');
-    }
-
-    poolConfig = {
-      connectionString,
-      ssl: { rejectUnauthorized: false },
-      // Add connection pool settings optimized for serverless
-      max: 1, // Limit to 1 connection per Lambda instance
-      idleTimeoutMillis: 120000, // Keep connections alive between invocations
-      connectionTimeoutMillis: 10000, // Timeout for new connections
-      casing: 'snake_case', // Use snake_case for column names
-    };
-  } else {
-    poolConfig = {
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT || '5432'),
-      database: process.env.DB_NAME,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      casing: 'snake_case',
-    };
+  const connectionString = process.env.NEON_DATABASE_URL;
+  if (!connectionString) {
+    throw new Error('NEON_DATABASE_URL is required');
   }
 
-  poolConnection = new Pool(poolConfig);
+  // Optimized config for Neon serverless
+  const config: postgres.Options<any> = {
+    // Since you're using Neon's pooled connection, we can have slightly more connections
+    max: isProduction ? 1 : 2,
 
-  return drizzle(poolConnection, { schema });
+    // Neon handles SSL automatically, but we can be explicit
+    ssl: 'require',
+
+    // Connection timeouts optimized for serverless
+    idle_timeout: 20, // 20 seconds - quick cleanup
+    connect_timeout: 10, // 10 seconds - fail fast
+
+    // Disable prepared statements for better compatibility with pooled connections
+    prepare: false,
+
+    // Enable debug logging based on LOG_LEVEL
+    debug: process.env.LOG_LEVEL === 'debug',
+  };
+
+  console.log('Connecting to Neon database...');
+
+  // Create postgres connection
+  sql = postgres(connectionString, config);
+
+  // Create drizzle instance
+  return drizzle(sql, { schema });
 }
 
 // Export a function to get the DB connection (ensures connection reuse)
-export function getDb() {
+export function getDb(): PostgresJsDatabase<typeof schema> {
   if (!db) {
     db = createDrizzleClient();
   }
   return db;
 }
 
-// Export the pool connection for migrations and cleanup
+// Export for migrations and cleanup (compatible with both pg and postgres patterns)
 export const connection = {
+  // For migration compatibility - returns the postgres.js sql instance
   get pool() {
-    if (!poolConnection) {
-      // Ensure the pool is created if accessed directly
-      createDrizzleClient();
+    if (!sql) {
+      // Ensure the connection is created if accessed directly
+      db = createDrizzleClient();
     }
-    return poolConnection;
+    return sql;
   },
+
+  // Direct access to postgres.js sql instance
+  get sql() {
+    if (!sql) {
+      db = createDrizzleClient();
+    }
+    return sql;
+  },
+
+  // Cleanup function
   end: async () => {
-    if (poolConnection) {
-      await poolConnection.end();
+    if (sql) {
+      await sql.end();
+      sql = undefined!;
+      db = undefined!;
     }
   },
 };
