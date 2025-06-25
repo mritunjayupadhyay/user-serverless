@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { pick } from 'lodash';
 import { ConfigService } from '@nestjs/config';
 import { UserRepository } from './users.repository';
 import {
@@ -73,10 +74,28 @@ export class UsersService {
     updateUserDto: Partial<UpdateUserDto>,
   ): Promise<UserDto> {
     try {
-      const updatedUser = await this.userRepository.updateUser(
-        id,
+      const allowedFields: (keyof UpdateUserDto)[] = [
+        'firstName',
+        'lastName',
+        'phone',
+        'isActive',
+        'gender',
+        'profilePic',
+        'birthday',
+      ];
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      const updateData = pick(
         updateUserDto,
+        allowedFields,
+      ) as Partial<UpdateUserDto>;
+
+      // Optional: Remove undefined values
+      const cleanedData = Object.fromEntries(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        Object.entries(updateData).filter(([_, value]) => value !== undefined),
       );
+      const updatedUser = await this.userRepository.updateUser(id, cleanedData);
 
       if (!updatedUser) {
         throw new NotFoundException(`User with ID ${id} not found`);

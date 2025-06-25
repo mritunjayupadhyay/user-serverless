@@ -4,11 +4,18 @@ import { Exclude, Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
   IsString,
 } from 'class-validator';
+
+export enum Gender {
+  MALE = 'male',
+  FEMALE = 'female',
+  OTHER = 'other',
+}
 
 export class CreateUserDto {
   @ApiProperty({
@@ -34,6 +41,20 @@ export class CreateUserDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @IsEnum(Gender, {
+    message: 'Gender must be one of: male, female, other',
+  })
+  @IsOptional()
+  gender?: Gender;
+
+  @IsString()
+  @IsOptional()
+  profilePic?: string;
+
+  @IsString()
+  @IsOptional()
+  birthday?: string;
 }
 
 export class CreateUserWithClerkDto extends CreateUserDto {
@@ -55,14 +76,28 @@ export class UpdateUserDto {
   @IsOptional()
   lastName?: string;
 
-  @IsPhoneNumber()
+  @IsString()
   @IsOptional()
   phone?: string;
 
-  @IsOptional()
   @IsBoolean()
+  @IsOptional()
   @Transform(({ value }) => value === 'true' || value === true)
   isActive?: boolean;
+
+  @IsEnum(Gender, {
+    message: 'Gender must be one of: male, female, other',
+  })
+  @IsOptional()
+  gender?: Gender;
+
+  @IsString()
+  @IsOptional()
+  profilePic?: string;
+
+  @IsString()
+  @IsOptional()
+  birthday?: string;
 }
 
 export class UserDto {
