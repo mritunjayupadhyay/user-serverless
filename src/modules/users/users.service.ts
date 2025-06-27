@@ -38,13 +38,12 @@ export class UsersService {
     return user;
   }
   async findByClerkId(clerkId: string): Promise<UserDto> {
-    const user = await this.userRepository.findByClerkId(clerkId);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
+    try {
+      return await this.userRepository.findByClerkId(clerkId);
+    } catch (error: unknown) {
+      this.handleDatabaseError(error);
+      return null;
     }
-
-    return user;
   }
   async createUser(createUserDto: CreateUserDto): Promise<UserDto> {
     try {

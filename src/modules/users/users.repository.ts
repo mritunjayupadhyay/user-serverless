@@ -27,13 +27,13 @@ export class UserRepository {
     return results.length ? results[0] : null;
   }
   async findByClerkId(clerkId: string): Promise<UserDto | null> {
-    const results = await this.db
+    const [user] = await this.db
       .select()
       .from(schema.members)
       .where(eq(schema.members.clerkId, clerkId))
       .limit(1);
 
-    return results.length ? results[0] : null;
+    return user || null;
   }
   async createUser(data: CreateUserWithClerkDto): Promise<UserDto> {
     // Create an object with only the fields that exist in the schema
