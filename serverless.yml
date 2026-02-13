@@ -62,7 +62,7 @@ functions:
     environment:
       NODE_ENV: ${opt:stage, 'local'}
       MY_PARAMETER: ${ssm:/my-first-parameter-store, 'local-fallback-value'}
-    handler: dist/src/lambda.handler
+    handler: dist/lambda.handler
     events:
       - http:
           path: /{proxy+}

@@ -3,7 +3,7 @@ import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import postgres = require('postgres');
 import * as dotenv from 'dotenv';
-import * as schema from 'exam-question-bank-db/schema';
+import * as schema from 'exam-question-bank-db';
 
 // Connection pooling is different in serverless environments
 let db: PostgresJsDatabase<typeof schema>;

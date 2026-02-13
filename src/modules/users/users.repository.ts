@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { eq } from 'drizzle-orm';
-import * as schema from 'exam-question-bank-db/schema';
+import * as schema from 'exam-question-bank-db';
 import { CreateUserWithClerkDto, UpdateUserDto, UserDto } from './dto/user.dto';
 
 @Injectable()

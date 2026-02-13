@@ -40,7 +40,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "drizzle-orm": "^0.40.0",
-    "exam-question-bank-db": "^1.0.0",
+    "exam-question-bank-db": "github:mritunjayupadhyay/exam-question-bank-db#v1.0.0",
     "postgres": "^3.4.5",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
