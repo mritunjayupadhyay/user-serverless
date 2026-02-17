@@ -11,6 +11,7 @@ import {
   ValidationPipe,
   ParseUUIDPipe,
   Get,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -67,6 +68,31 @@ export class UsersController {
     @Body(new ValidationPipe({ transform: true })) createUserDto: CreateUserDto,
   ): Promise<UserDto> {
     return this.usersService.createUser(createUserDto);
+  }
+
+  @Get('clerk/:clerkId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get a user by Clerk ID' })
+  @ApiParam({
+    name: 'clerkId',
+    description: 'Clerk user ID',
+    type: 'string',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User found',
+    type: UserDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+  })
+  async findByClerkId(@Param('clerkId') clerkId: string): Promise<UserDto> {
+    const user = await this.usersService.findByClerkId(clerkId);
+    if (!user) {
+      throw new NotFoundException(`User with Clerk ID ${clerkId} not found`);
+    }
+    return user;
   }
 
   @Post('clerk')
